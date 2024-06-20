@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { format } from 'date-fns';
+import { Exclude } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -20,11 +21,10 @@ export class UserService {
   ) {}
 
   async createUser(user: Partial<User>): Promise<User> {
-    console.log({ user });
     return this.userRepository.save(user);
   }
 
-  async findAll(currentUserId: string): Promise<User[]> {
+  async findAll(currentUserId: string): Promise<Partial<User>[]> {
     const users = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.blockedUsers', 'blockedUsers')
@@ -37,10 +37,13 @@ export class UserService {
         { currentUserId },
       )
       .getMany();
-    return users;
+    return users.map((user) => this.excludeSensitiveFields(user));
   }
 
-  async findOne(username: string, currentUserId: string): Promise<User> {
+  async findOne(
+    username: string,
+    currentUserId: string,
+  ): Promise<Partial<User>> {
     const user = await this.userRepository.findOne({
       where: { username },
       relations: ['blockedByUsers'],
@@ -58,7 +61,10 @@ export class UserService {
       throw new ForbiddenException('blocked_by_user');
     }
 
-    return this.userRepository.findOne({ where: { username } });
+    const { password, ...result } = await this.userRepository.findOne({
+      where: { username },
+    });
+    return result;
   }
 
   async searchUsers(
@@ -66,7 +72,7 @@ export class UserService {
     userId: string,
     minAge?: number,
     maxAge?: number,
-  ): Promise<User[]> {
+  ): Promise<Partial<User>[]> {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.blockedUsers', 'blockedUsers')
@@ -75,7 +81,6 @@ export class UserService {
     const currentDate = new Date();
 
     if (keyword) {
-      console.log('entering keyword');
       query.andWhere(
         'user.username LIKE :keyword OR user.name LIKE :keyword OR user.surname LIKE :keyword',
         { keyword: `%${keyword}%` },
@@ -105,8 +110,10 @@ export class UserService {
         'NOT EXISTS (SELECT 1 FROM "user_blocked_users_user" ub WHERE ub."userId_1" = user.id AND ub."userId_2" = :userId)',
       { userId },
     );
-    console.log(query.getQueryAndParameters());
-    return query.getMany();
+    const users = (await query.getMany()).map((user) =>
+      this.excludeSensitiveFields(user),
+    );
+    return users;
   }
 
   async getToken(
@@ -129,5 +136,10 @@ export class UserService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  private excludeSensitiveFields(user: Partial<User>): Partial<User> {
+    const { password, ...result } = user;
+    return result;
   }
 }

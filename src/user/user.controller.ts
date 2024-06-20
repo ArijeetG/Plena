@@ -21,7 +21,6 @@ export class UserController {
 
   @Post()
   async createUser(@Body() user: Partial<User>): Promise<User> {
-    console.log({ user });
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(user.password, salt);
     let payload: Partial<User> = {
@@ -34,7 +33,7 @@ export class UserController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
-  async findAll(@Req() request: any): Promise<User[]> {
+  async findAll(@Req() request: any): Promise<Partial<User>[]> {
     const userId = request.user.userId;
     return this.userService.findAll(userId);
   }
@@ -46,8 +45,7 @@ export class UserController {
     @Query('minAge') minAge: number,
     @Query('maxAge') maxAge: number,
     @Req() request: any,
-  ): Promise<User[]> {
-    console.log(request.user);
+  ): Promise<Partial<User>[]> {
     return this.userService.searchUsers(
       keyword,
       request.user.sub,
@@ -62,7 +60,7 @@ export class UserController {
   async findOne(
     @Param('username') username: string,
     @Req() request: any,
-  ): Promise<User> {
+  ): Promise<Partial<User>> {
     return this.userService.findOne(username, request.user.id);
   }
 

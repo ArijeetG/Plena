@@ -1,5 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
