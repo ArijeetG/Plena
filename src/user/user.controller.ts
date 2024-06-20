@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -30,11 +31,26 @@ export class UserController {
     return this.userService.createUser(payload);
   }
 
+  @Put()
+  @UseGuards(JwtAuthGuard)
+  async editUser(@Req() request: any) {
+    const userId = request.user.sub;
+    return this.userService.editUser(userId, request.body);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  async getUser(@Req() request: any): Promise<Partial<User>> {
+    const userId = request.user.sub;
+    return this.userService.getUser(userId);
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
   async findAll(@Req() request: any): Promise<Partial<User>[]> {
-    const userId = request.user.userId;
+    const userId = request.user.sub;
     return this.userService.findAll(userId);
   }
 

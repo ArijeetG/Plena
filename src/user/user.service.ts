@@ -24,6 +24,21 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  async getUser(userId: string): Promise<Partial<User>> {
+    const isUser = await this.userRepository.findOne({ where: { id: userId } });
+    if (!isUser) {
+      throw new NotFoundException('user_not_found');
+    }
+
+    delete isUser.password;
+    return isUser;
+  }
+
+  async editUser(userId: string, payload: Partial<User>): Promise<User> {
+    this.userRepository.update(userId, payload);
+    return this.userRepository.findOne({ where: { id: userId } });
+  }
+
   async findAll(currentUserId: string): Promise<Partial<User>[]> {
     const users = await this.userRepository
       .createQueryBuilder('user')
