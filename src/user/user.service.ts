@@ -9,6 +9,7 @@ import { User } from '../model/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { format } from 'date-fns';
 
 @Injectable()
 export class UserService {
@@ -60,19 +61,52 @@ export class UserService {
     return this.userRepository.findOne({ where: { username } });
   }
 
-  async searchUsers(keyword: string, userId: string): Promise<User[]> {
-    const users = await this.userRepository
+  async searchUsers(
+    keyword: string = '',
+    userId: string,
+    minAge?: number,
+    maxAge?: number,
+  ): Promise<User[]> {
+    const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.blockedUsers', 'blockedUsers')
-      .where(
-        'user.name LIKE :keyword OR user.surname LIKE :keyword OR user.username LIKE :keyword',
+      .leftJoin('user.blockedByUsers', 'blockedByUsers');
+
+    const currentDate = new Date();
+
+    if (keyword) {
+      console.log('entering keyword');
+      query.andWhere(
+        'user.username LIKE :keyword OR user.name LIKE :keyword OR user.surname LIKE :keyword',
         { keyword: `%${keyword}%` },
-      )
-      .andWhere('blockedUsers.id IS NULL OR blockedUsers.id != :userId', {
-        userId,
-      })
-      .getMany();
-    return users;
+      );
+    }
+
+    if (minAge !== undefined) {
+      const minBirthdate = new Date(currentDate.getFullYear() - minAge, 0, 1);
+      query.andWhere('user.birthdate <= :minBirthdate', {
+        minBirthdate: format(minBirthdate, 'yyyy-MM-dd'),
+      });
+    }
+
+    if (maxAge !== undefined) {
+      const maxBirthdate = new Date(
+        currentDate.getFullYear() - maxAge + 1,
+        0,
+        0,
+      );
+      query.andWhere('user.birthdate >= :maxBirthdate', {
+        maxBirthdate: format(maxBirthdate, 'yyyy-MM-dd'),
+      });
+    }
+
+    query.andWhere(
+      'NOT EXISTS (SELECT 1 FROM "user_blocked_users_user" ub WHERE ub."userId_2" = user.id AND ub."userId_1" = :userId) AND ' +
+        'NOT EXISTS (SELECT 1 FROM "user_blocked_users_user" ub WHERE ub."userId_1" = user.id AND ub."userId_2" = :userId)',
+      { userId },
+    );
+    console.log(query.getQueryAndParameters());
+    return query.getMany();
   }
 
   async getToken(

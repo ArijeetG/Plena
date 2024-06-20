@@ -7,11 +7,13 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from 'src/model/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtAuthGuard } from '../jwt/jwt.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('user')
 export class UserController {
@@ -31,26 +33,37 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
   async findAll(@Req() request: any): Promise<User[]> {
     const userId = request.user.userId;
     return this.userService.findAll(userId);
   }
 
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async searchUsers(
+    @Query('keyword') keyword: string,
+    @Query('minAge') minAge: number,
+    @Query('maxAge') maxAge: number,
+    @Req() request: any,
+  ): Promise<User[]> {
+    console.log(request.user);
+    return this.userService.searchUsers(
+      keyword,
+      request.user.sub,
+      minAge,
+      maxAge,
+    );
+  }
+
   @Get(':username')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(CacheInterceptor)
   async findOne(
     @Param('username') username: string,
     @Req() request: any,
   ): Promise<User> {
     return this.userService.findOne(username, request.user.id);
-  }
-
-  @Get('search')
-  async searchUsers(
-    @Query('keyword') keyword: string,
-    @Query('userId') userId: string,
-  ): Promise<User[]> {
-    return this.userService.searchUsers(keyword, userId);
   }
 
   @Post('get-token')
