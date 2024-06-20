@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from 'src/model/user.entity';
 import * as bcrypt from 'bcrypt';
+import { JwtAuthGuard } from '../jwt/jwt.guard';
 
 @Controller('user')
 export class UserController {
@@ -20,13 +30,19 @@ export class UserController {
   }
 
   @Get()
-  async findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Req() request: any): Promise<User[]> {
+    const userId = request.user.userId;
+    return this.userService.findAll(userId);
   }
 
   @Get(':username')
-  async findOne(@Param('username') username: string): Promise<User> {
-    return this.userService.findOne(username);
+  @UseGuards(JwtAuthGuard)
+  async findOne(
+    @Param('username') username: string,
+    @Req() request: any,
+  ): Promise<User> {
+    return this.userService.findOne(username, request.user.id);
   }
 
   @Get('search')

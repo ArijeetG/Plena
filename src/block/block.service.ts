@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../model/user.entity';
 import { Repository } from 'typeorm';
@@ -19,9 +23,15 @@ export class BlockService {
       where: { id: blockUserId },
     });
 
-    if (user && blockUser) {
+    if (!user || !blockUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.blockedUsers.some((u) => u.id === blockUserId)) {
       user.blockedUsers.push(blockUser);
       await this.userRepository.save(user);
+    } else {
+      throw new BadRequestException('User is already blocked');
     }
   }
 
@@ -31,15 +41,22 @@ export class BlockService {
       relations: ['blockedUsers'],
     });
 
-    const blockUser = await this.userRepository.findOne({
-      where: { id: blockUserId },
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    console.log({
+      blockedByUsers: user.blockedByUsers,
+      blockedUser: user.blockedUsers,
     });
-
-    if (user && blockUser && user.blockedUsers.includes(blockUser)) {
+    if (
+      user.blockedUsers.some((blockedUser) => blockedUser.id === blockUserId)
+    ) {
       user.blockedUsers = user.blockedUsers.filter(
-        (u) => u.id === blockUser.id,
+        (blockedUser) => blockedUser.id !== blockUserId,
       );
       await this.userRepository.save(user);
+    } else {
+      throw new BadRequestException('User is not blocked');
     }
   }
 }

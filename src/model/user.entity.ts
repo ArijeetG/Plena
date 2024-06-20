@@ -18,7 +18,10 @@ export class User extends BaseEntity {
   @Column({ type: 'date' })
   birthdate: Date;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.blockedByUsers)
   @JoinTable()
   blockedUsers: User[];
+
+  @ManyToMany(() => User, (user) => user.blockedUsers)
+  blockedByUsers: User[];
 }

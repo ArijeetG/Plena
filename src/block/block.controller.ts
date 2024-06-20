@@ -1,23 +1,28 @@
-import { Controller, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { BlockService } from './block.service';
+import { JwtAuthGuard } from '../jwt/jwt.guard';
 
 @Controller('block')
 export class BlockController {
   constructor(private readonly blockService: BlockService) {}
 
-  @Post(':userId/:blockUserId')
+  @Get(':blockUserId')
+  @UseGuards(JwtAuthGuard)
   async blockUser(
-    @Param('userId') userId: string,
     @Param('blockUserId') blockUserId: string,
+    @Req() request: any,
   ): Promise<void> {
+    const userId = request.user.userId;
     await this.blockService.blockUser(userId, blockUserId);
   }
 
-  @Post('unblock/:userId/:blockUserId')
+  @Get('unblock/:blockUserId')
+  @UseGuards(JwtAuthGuard)
   async unblockUser(
-    @Param('userId') userId: string,
     @Param('blockUserId') blockUserId: string,
+    @Req() request: any,
   ): Promise<void> {
+    const userId = request.user.userId;
     await this.blockService.unblockUser(userId, blockUserId);
   }
 }

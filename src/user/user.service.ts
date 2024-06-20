@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../model/user.entity';
 import { Repository } from 'typeorm';
@@ -18,11 +23,40 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(currentUserId: string): Promise<User[]> {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.blockedUsers', 'blockedUsers')
+      .leftJoin('user.blockedByUsers', 'blockedByUsers')
+      .where('blockedUsers.id IS NULL OR blockedUsers.id != :currentUserId', {
+        currentUserId,
+      })
+      .andWhere(
+        'blockedByUsers.id IS NULL OR blockedByUsers.id != :currentUserId',
+        { currentUserId },
+      )
+      .getMany();
+    return users;
   }
 
-  async findOne(username: string): Promise<User> {
+  async findOne(username: string, currentUserId: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { username },
+      relations: ['blockedByUsers'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('user_not_found');
+    }
+
+    if (
+      user.blockedByUsers.some(
+        (blockedUser) => blockedUser.id === currentUserId,
+      )
+    ) {
+      throw new ForbiddenException('blocked_by_user');
+    }
+
     return this.userRepository.findOne({ where: { username } });
   }
 
