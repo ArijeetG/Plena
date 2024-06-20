@@ -46,7 +46,7 @@ export class UserController {
     return this.userService.getUser(userId);
   }
 
-  @Get()
+  @Get('all')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(CacheInterceptor)
   async findAll(@Req() request: any): Promise<Partial<User>[]> {

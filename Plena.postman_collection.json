@@ -1,0 +1,292 @@
+{
+	"info": {
+		"_postman_id": "cac61241-45dc-4868-bf91-1935c4feace0",
+		"name": "Plena",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Jon\",\n    \"surname\": \"Doe\",\n    \"password\": \"Test@1234\",\n    \"username\": \"jonDoe\",\n    \"birthdate\": \"2000-01-25\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"jonDoe\",\n    \"password\": \"Test@1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user/get-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"get-token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-all-users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNGMzMWU4OC1kYjI3LTRlNzYtYmJhMy00ODU4MzZmM2MyNzAiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODkxNjc4MSwiZXhwIjoxNzE4OTIwMzgxfQ.hQdJz9qEPhsMv-I4QXe3HrxZ_XDyf_Dhr7qQJ_nNXds",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNjA3YTkzNC03Y2QwLTQ2MzQtODA4ZC0wMzNmNWNiMmZlYTkiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODg3MTk0NSwiZXhwIjoxNzE4ODc1NTQ1fQ.Y86qb-Uqi64KrtIPbKXRNCkh-iHpSJTb5FCouAvaU3A",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "block-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNGMzMWU4OC1kYjI3LTRlNzYtYmJhMy00ODU4MzZmM2MyNzAiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODg5MTU5OCwiZXhwIjoxNzE4ODk1MTk4fQ.RH5J0pWvgJpUPOeCOqHay1nXBdRtsxBSGqotcWzxPcI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/block/3a8c8849-aa1b-4db3-9788-8bd84616e1bb",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"block",
+						"3a8c8849-aa1b-4db3-9788-8bd84616e1bb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unblock-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNGMzMWU4OC1kYjI3LTRlNzYtYmJhMy00ODU4MzZmM2MyNzAiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODg5MTU5OCwiZXhwIjoxNzE4ODk1MTk4fQ.RH5J0pWvgJpUPOeCOqHay1nXBdRtsxBSGqotcWzxPcI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/block/unblock/3a8c8849-aa1b-4db3-9788-8bd84616e1bb",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"block",
+						"unblock",
+						"3a8c8849-aa1b-4db3-9788-8bd84616e1bb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNGMzMWU4OC1kYjI3LTRlNzYtYmJhMy00ODU4MzZmM2MyNzAiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODg5MTU5OCwiZXhwIjoxNzE4ODk1MTk4fQ.RH5J0pWvgJpUPOeCOqHay1nXBdRtsxBSGqotcWzxPcI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/user/search?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"search"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNGMzMWU4OC1kYjI3LTRlNzYtYmJhMy00ODU4MzZmM2MyNzAiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODkwMjczMSwiZXhwIjoxNzE4OTA2MzMxfQ.J-3P9QD6Kih4koZxBNIgZcj_ewcbGtZKcrbMUqAEYwU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Jon-edited\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-user",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNGMzMWU4OC1kYjI3LTRlNzYtYmJhMy00ODU4MzZmM2MyNzAiLCJ1c2VybmFtZSI6ImpvbkRvZSIsImlhdCI6MTcxODkwMjczMSwiZXhwIjoxNzE4OTA2MzMxfQ.J-3P9QD6Kih4koZxBNIgZcj_ewcbGtZKcrbMUqAEYwU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Jon-edited\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
